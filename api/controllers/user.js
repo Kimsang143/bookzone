@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
 const User = require("../models/user");
+const config = require('../middleware/config.js');
 
 exports.user_signup = (req, res, next) => {
   User.find({ email: req.body.email })
@@ -65,7 +65,7 @@ exports.user_login = (req, res, next) => {
               email: user[0].email,
               userId: user[0]._id
             },
-            process.env.JWT_KEY,
+           'secret',
             {
               expiresIn: "1h"
             }
