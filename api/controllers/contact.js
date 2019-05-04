@@ -1,23 +1,28 @@
 const mongoose = require("mongoose");
-const Product = require("../models/product");
-const User = require("../models/user");
+const Contact = require("../models/contact");
 
-exports.products_get_all = (req, res, next) => {
-  Product.find()
-    .select("name price _id productImage")
+
+exports.contacts_get_all = (req, res, next) => {
+  Contact.find()
+    .select("name descript _id contactImage contactname email location telephone facebook")
     .exec()
     .then(docs => {
       const response = {
         count: docs.length,
-        products: docs.map(doc => {
+        contacts: docs.map(doc => {
           return {
             name: doc.name,
-            price: doc.price,
-            productImage: doc.productImage,
+            descript: doc.descript,
+            contactImage: doc.contactImage,
+            contactname: doc.contactname,
+            email: doc.email,
+            location: doc.location,
+            telephone: doc.telephone,
+            facebook: doc.facebook,
             _id: doc._id,
             request: {
               type: "GET",
-              url: "http://localhost:3000/products/" + doc._id
+              url: "http://localhost:3000/contacts/" + doc._id
             }
           };
         })
@@ -38,26 +43,30 @@ exports.products_get_all = (req, res, next) => {
     });
 };
 
-exports.products_create_product = (req, res, next) => {
-  const product = new Product({
+exports.contacts_create_contact = (req, res, next) => {
+  const contact = new Contact({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
-    price: req.body.price,
-    productImage: req.file.url
+    contactImage: req.file.url,
+    descript: req.body.descript,
+    contactname: req.body.contactname,
+    email: req.body.email,
+    location: req.body.location,
+    telephone: req.body.telephone,
+    facebook: req.body.facebook
   });
-  product
+  contact
     .save()
     .then(result => {
       console.log(result);
       res.status(201).json({
-        message: "Created product successfully",
-        createdProduct: {
+        message: "Created contact successfully",
+        createdcontact: {
           name: result.name,
-          price: result.price,
           _id: result._id,
           request: {
             type: "GET",
-            url: "http://localhost:3000/products/" + result._id
+            url: "http://localhost:3000/contacts/" + result._id
           }
         }
       });
@@ -70,19 +79,19 @@ exports.products_create_product = (req, res, next) => {
     });
 };
 
-exports.products_get_product = (req, res, next) => {
-  const id = req.params.productId;
-  Product.findById(id)
-    .select("name price _id productImage")
+exports.contacts_get_contact = (req, res, next) => {
+  const id = req.params.contactId;
+  Contact.findById(id)
+    .select()
     .exec()
     .then(doc => {
       console.log("From database", doc);
       if (doc) {
         res.status(200).json({
-          product: doc,
+          contact: doc,
           request: {
             type: "GET",
-            url: "http://localhost:3000/products"
+            url: "http://localhost:3000/contacts"
           }
         });
       } else {
@@ -97,20 +106,20 @@ exports.products_get_product = (req, res, next) => {
     });
 };
 
-exports.products_update_product = (req, res, next) => {
-  const id = req.params.productId;
+exports.contacts_update_contact = (req, res, next) => {
+  const id = req.params.contactId;
   const updateOps = {};
   for (const ops of req.body) {
     updateOps[ops.propName] = ops.value;
   }
-  Product.update({ _id: id }, { $set: updateOps })
+  Contact.update({ _id: id }, { $set: updateOps })
     .exec()
     .then(result => {
       res.status(200).json({
-        message: "Product updated",
+        message: "contact updated",
         request: {
           type: "GET",
-          url: "http://localhost:3000/products/" + id
+          url: "http://localhost:3000/contacts/" + id
         }
       });
     })
@@ -122,17 +131,17 @@ exports.products_update_product = (req, res, next) => {
     });
 };
 
-exports.products_delete = (req, res, next) => {
-  const id = req.params.productId;
-  Product.remove({ _id: id })
+exports.contacts_delete = (req, res, next) => {
+  const id = req.params.contactId;
+  Contact.remove({ _id: id })
     .exec()
     .then(result => {
       res.status(200).json({
-        message: "Product deleted",
+        message: "contact deleted",
         request: {
           type: "POST",
-          url: "http://localhost:3000/products",
-          body: { name: "String", price: "Number" }
+          url: "http://localhost:3000/contacts",
+          body: { name: "String", descript: "String" }
         }
       });
     })
