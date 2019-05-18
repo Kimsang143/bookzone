@@ -4,7 +4,7 @@ const User = require("../models/user");
 
 exports.products_get_all = (req, res, next) => {
   Product.find()
-    .select("name price _id productImage")
+    .select("name price _id productImage user")
     .exec()
     .then(docs => {
       const response = {
@@ -15,6 +15,7 @@ exports.products_get_all = (req, res, next) => {
             price: doc.price,
             productImage: doc.productImage,
             _id: doc._id,
+            user: doc.user,
             request: {
               type: "GET",
               url: "http://localhost:3000/products/" + doc._id
@@ -39,11 +40,14 @@ exports.products_get_all = (req, res, next) => {
 };
 
 exports.products_create_product = (req, res, next) => {
+  const body = req.body;
+
   const product = new Product({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
     price: req.body.price,
-    productImage: req.file.url
+    productImage: req.file.url,
+    user: req.userData.userId
   });
   product
     .save()
@@ -73,7 +77,7 @@ exports.products_create_product = (req, res, next) => {
 exports.products_get_product = (req, res, next) => {
   const id = req.params.productId;
   Product.findById(id)
-    .select("name price _id productImage")
+    .select()
     .exec()
     .then(doc => {
       console.log("From database", doc);
