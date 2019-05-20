@@ -42,24 +42,89 @@ exports.products_get_all = (req, res, next) => {
 
 exports.products_get_new = (req, res, next) => {
   Product.find().limit(10).sort({ "createdAt" : -1 })
-    .select("name price _id productImage user")
+    .select()
     .exec()
     .then(docs => {
       const response = {
         count: docs.length,
-        products: docs.map(doc => {
-          return {
-            name: doc.name,
-            price: doc.price,
-            productImage: doc.productImage,
-            _id: doc._id,
-            user: doc.user,
-            request: {
-              type: "GET",
-              url: "http://localhost:3000/products/" + doc._id
-            }
-          };
-        })
+        products: docs
+      };
+      //   if (docs.length >= 0) {
+      res.status(200).json(response);
+      //   } else {
+      //       res.status(404).json({
+      //           message: 'No entries found'
+      //       });
+      //   }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
+};
+
+
+exports.products_get_popular = (req, res, next) => {
+  Product.find().limit(3).sort({ "createdAt" : -1 })
+    .select()
+    .exec()
+    .then(docs => {
+      const response = {
+        count: docs.length,
+        products: docs
+      };
+      //   if (docs.length >= 0) {
+      res.status(200).json(response);
+      //   } else {
+      //       res.status(404).json({
+      //           message: 'No entries found'
+      //       });
+      //   }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
+};
+
+
+exports.products_get_best = (req, res, next) => {
+  Product.find().limit(10).sort({ "price": -1 ,"createdAt" : -1 })
+    .select()
+    .exec()
+    .then(docs => {
+      const response = {
+        count: docs.length,
+        products: docs
+      };
+      //   if (docs.length >= 0) {
+      res.status(200).json(response);
+      //   } else {
+      //       res.status(404).json({
+      //           message: 'No entries found'
+      //       });
+      //   }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
+};
+
+
+exports.products_get_user = (req, res, next) => {
+  Product.aggregate([{$group : {_id : "$user", user_product : {$sum : 1}}}])
+    .exec()
+    .then(docs => {
+      const response = {
+        count: docs.length,
+        products: docs
       };
       //   if (docs.length >= 0) {
       res.status(200).json(response);
