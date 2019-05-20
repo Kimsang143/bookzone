@@ -39,6 +39,44 @@ exports.products_get_all = (req, res, next) => {
     });
 };
 
+
+exports.products_get_new = (req, res, next) => {
+  Product.find().limit(10).sort({ "createdAt" : -1 })
+    .select("name price _id productImage user")
+    .exec()
+    .then(docs => {
+      const response = {
+        count: docs.length,
+        products: docs.map(doc => {
+          return {
+            name: doc.name,
+            price: doc.price,
+            productImage: doc.productImage,
+            _id: doc._id,
+            user: doc.user,
+            request: {
+              type: "GET",
+              url: "http://localhost:3000/products/" + doc._id
+            }
+          };
+        })
+      };
+      //   if (docs.length >= 0) {
+      res.status(200).json(response);
+      //   } else {
+      //       res.status(404).json({
+      //           message: 'No entries found'
+      //       });
+      //   }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
+};
+
 exports.products_create_product = (req, res, next) => {
   const body = req.body;
 
@@ -77,17 +115,14 @@ exports.products_create_product = (req, res, next) => {
 exports.products_get_product = (req, res, next) => {
   const id = req.params.productId;
   Product.findById(id)
-    .populate("user")
+    .populate("user","email")
     .exec()
     .then(doc => {
       console.log("From database", doc);
       if (doc) {
         res.status(200).json({
           product: doc,
-          request: {
-            type: "GET",
-            url: "http://localhost:3000/products"
-          }
+          
         });
       } else {
         res
