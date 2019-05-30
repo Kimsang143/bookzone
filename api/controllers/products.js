@@ -4,7 +4,7 @@ const User = require("../models/user");
 
 exports.products_get_all = (req, res, next) => {
   Product.find()
-    .select("name price _id productImage")
+    .select("name price _id productImage user")
     .exec()
     .then(docs => {
       const response = {
@@ -15,6 +15,7 @@ exports.products_get_all = (req, res, next) => {
             price: doc.price,
             productImage: doc.productImage,
             _id: doc._id,
+            user: doc.user,
             request: {
               type: "GET",
               url: "http://localhost:3000/products/" + doc._id
@@ -38,12 +39,138 @@ exports.products_get_all = (req, res, next) => {
     });
 };
 
+// Find a Products by Name
+exports.products_get_search = (req, res, next) => {
+  
+  Product.findOne({ name: req.params.productName })
+  .select()
+  .exec(function (err, product) {
+    if (err){
+      if(err.kind === 'ObjectId') {
+        return res.status(404).send({
+          message: "Book not found with given name " + req.params.productName
+        });                
+      }
+      return res.status(500).send({
+        message: "Error retrieving Products with given User Id " + req.params.productName
+      });
+    }
+          
+    res.send(product);
+  });
+};
+
+exports.products_get_new = (req, res, next) => {
+  Product.find().limit(10).sort({ "createdAt" : -1 })
+    .select()
+    .exec()
+    .then(docs => {
+      const response = {
+        count: docs.length,
+        products: docs
+      };
+      //   if (docs.length >= 0) {
+      res.status(200).json(response);
+      //   } else {
+      //       res.status(404).json({
+      //           message: 'No entries found'
+      //       });
+      //   }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
+};
+
+
+exports.products_get_popular = (req, res, next) => {
+  Product.find().limit(3).sort({ "createdAt" : -1 })
+    .select()
+    .exec()
+    .then(docs => {
+      const response = {
+        count: docs.length,
+        products: docs
+      };
+      //   if (docs.length >= 0) {
+      res.status(200).json(response);
+      //   } else {
+      //       res.status(404).json({
+      //           message: 'No entries found'
+      //       });
+      //   }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
+};
+
+
+exports.products_get_best = (req, res, next) => {
+  Product.find().limit(10).sort({ "price": -1 ,"createdAt" : -1 })
+    .select()
+    .exec()
+    .then(docs => {
+      const response = {
+        count: docs.length,
+        products: docs
+      };
+      //   if (docs.length >= 0) {
+      res.status(200).json(response);
+      //   } else {
+      //       res.status(404).json({
+      //           message: 'No entries found'
+      //       });
+      //   }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
+};
+
+
+exports.products_get_user = (req, res, next) => {
+  Product.aggregate([{$group : {_id : "$user", user_product : {$sum : 1}}}])
+    .exec()
+    .then(docs => {
+      const response = {
+        count: docs.length,
+        products: docs
+      };
+      //   if (docs.length >= 0) {
+      res.status(200).json(response);
+      //   } else {
+      //       res.status(404).json({
+      //           message: 'No entries found'
+      //       });
+      //   }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
+};
+
 exports.products_create_product = (req, res, next) => {
+  const body = req.body;
+
   const product = new Product({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
     price: req.body.price,
-    productImage: req.file.url
+    productImage: req.file.url,
+    user: req.userData.userId
   });
   product
     .save()
@@ -70,20 +197,42 @@ exports.products_create_product = (req, res, next) => {
     });
 };
 
+// important user item
+// exports.products_get_users = (req, res, next) => {
+//   const id = req.params.productUser;
+//   Product.find( { user: mongoose.Types.ObjectId(id) } )
+//     .select("name price productImage")
+//     .exec()
+//     .then(doc => {
+//       console.log("From database", doc);
+//       if (doc) {
+//         res.status(200).json({
+//           product: doc,
+//         });
+//       } else {
+//         res
+//           .status(404)
+//           .json({ message: "No valid entry found for provided ID" });
+//       }
+//     })
+//     .catch(err => {
+//       console.log(err);
+//       res.status(500).json({ error: err });
+//     });
+// };
+
 exports.products_get_product = (req, res, next) => {
   const id = req.params.productId;
   Product.findById(id)
-    .select("name price _id productImage")
+    .select("name price productImage")
+    .populate("user","username shop_name tel email")
     .exec()
     .then(doc => {
       console.log("From database", doc);
       if (doc) {
         res.status(200).json({
           product: doc,
-          request: {
-            type: "GET",
-            url: "http://localhost:3000/products"
-          }
+          
         });
       } else {
         res
