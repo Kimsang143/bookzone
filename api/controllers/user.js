@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const config = require('../middleware/config.js');
 const Product = require("../models/product");
+
 exports.user_signup = (req, res, next) => {
   User.find({ email: req.body.email })
     .exec()
@@ -131,5 +132,20 @@ exports.users_get_product = (req, res, next) => {
     .catch(err => {
       console.log(err);
       res.status(500).json({ error: err });
+    });
+};
+
+exports.users_get_all = (req, res, next) => {
+  User.find({}, function (err, users) {
+        if (err) return res.status(500).send("There was a problem finding the users.");
+        res.status(200).send(users);
+    });
+};
+
+exports.users_get_one = (req, res, next) => {
+  User.findById(req.params.userId, function (err, user) {
+        if (err) return res.status(500).send("There was a problem finding the user.");
+        if (!user) return res.status(404).send("No user found.");
+        res.status(200).send(user);
     });
 };
