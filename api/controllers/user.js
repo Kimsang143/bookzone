@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const config = require('../middleware/config.js');
-
+const Product = require("../models/product");
 exports.user_signup = (req, res, next) => {
   User.find({ email: req.body.email })
     .exec()
@@ -108,5 +108,28 @@ exports.user_delete = (req, res, next) => {
       res.status(500).json({
         error: err
       });
+    });
+};
+
+exports.users_get_product = (req, res, next) => {
+  const id = req.params.productUser;
+  Product.find( { user: mongoose.Types.ObjectId(id) } )
+    .select("name price productImage")
+    .exec()
+    .then(doc => {
+      console.log("From database", doc);
+      if (doc) {
+        res.status(200).json({
+          product: doc,
+        });
+      } else {
+        res
+          .status(404)
+          .json({ message: "No valid entry found for provided ID" });
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({ error: err });
     });
 };
