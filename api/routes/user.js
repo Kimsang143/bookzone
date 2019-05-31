@@ -12,8 +12,8 @@ router.delete("/:userId", checkAuth, UserController.user_delete);
 
 router.get("/products/:productUser",UserController.users_get_product);
 
-router.get("/",checkAuth ,UserController.users_get_all);
+router.get("/",UserController.users_get_all);
 
-router.get("/:userId",checkAuth ,UserController.users_get_one);
+router.get("/:userId" ,UserController.users_get_one);
 
 module.exports = router;

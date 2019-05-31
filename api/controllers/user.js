@@ -116,12 +116,80 @@ exports.users_get_product = (req, res, next) => {
   const id = req.params.productUser;
   Product.find( { user: mongoose.Types.ObjectId(id) } )
     .select("name price productImage")
+    .populate("user","username shop_name tel email")
+    .exec()
+    .then(docs => {
+      const response = {
+        count: docs.length,
+        products: docs.map(doc => {
+          return {
+            name: doc.name,
+            price: doc.price,
+            productImage: doc.productImage,
+            _id: doc._id,
+            user: doc.user,
+          };
+        })
+      };
+        // if (docs.length >= 0) {
+      res.status(200).json(response);
+        // } else {
+        //     res.status(404).json({
+        //         message: 'No entries found'
+        //     });
+        // }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
+};
+
+exports.users_get_all = (req, res, next) => {
+  User.find()
+    .select("_id username shop_name tel email")
+    .exec()
+    .then(docs => {
+      const response = {
+        count: docs.length,
+        user: docs.map(doc => {
+          return {
+            _id: doc._id,
+            username: doc.username,
+            shop_name: doc.shop_name,
+            tel: doc.tel,
+            email: doc.email,
+          };
+  
+        })
+      };
+      //   if (docs.length >= 0) {
+      res.status(200).json(response);
+      //   } else {
+      //       res.status(404).json({
+      //           message: 'No entries found'
+      //       });
+      //   }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
+};
+
+exports.users_get_one = (req, res, next) => {
+  User.findById({ _id: req.params.userId })
+    .select("_id username shop_name tel email")
     .exec()
     .then(doc => {
       console.log("From database", doc);
       if (doc) {
         res.status(200).json({
-          product: doc,
+          user: doc,
         });
       } else {
         res
@@ -135,17 +203,3 @@ exports.users_get_product = (req, res, next) => {
     });
 };
 
-exports.users_get_all = (req, res, next) => {
-  User.find({}, function (err, users) {
-        if (err) return res.status(500).send("There was a problem finding the users.");
-        res.status(200).send(users);
-    });
-};
-
-exports.users_get_one = (req, res, next) => {
-  User.findById(req.params.userId, function (err, user) {
-        if (err) return res.status(500).send("There was a problem finding the user.");
-        if (!user) return res.status(404).send("No user found.");
-        res.status(200).send(user);
-    });
-};
