@@ -116,7 +116,7 @@ exports.users_get_product = (req, res, next) => {
   const id = req.params.productUser;
   Product.find( { user: mongoose.Types.ObjectId(id) } )
     .select("name price productImage")
-    .populate("user","username shop_name tel email")
+    //.populate("user","username shop_name tel email")
     .exec()
     .then(docs => {
       const response = {
@@ -127,7 +127,7 @@ exports.users_get_product = (req, res, next) => {
             price: doc.price,
             productImage: doc.productImage,
             _id: doc._id,
-            user: doc.user,
+            //user: doc.user,
           };
         })
       };
