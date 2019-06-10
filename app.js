@@ -9,6 +9,7 @@ const orderRoutes = require("./api/routes/orders");
 const userRoutes = require('./api/routes/user');
 const contactRoutes = require('./api/routes/contact');
 const categoryRoutes = require('./api/routes/category');
+const faqRoutes = require('./api/routes/faq');
 
 mongoose.connect(
   "mongodb://node-bookshop:" +
@@ -42,8 +43,9 @@ app.use((req, res, next) => {
 app.use("/products", productRoutes);
 app.use("/orders", orderRoutes);
 app.use("/user", userRoutes);
-app.use("/contact", contactRoutes);
+app.use("/contacts", contactRoutes);
 app.use("/categorys", categoryRoutes);
+app.use("/faqs", faqRoutes);
 
 app.use((req, res, next) => {
   const error = new Error("Not found");
