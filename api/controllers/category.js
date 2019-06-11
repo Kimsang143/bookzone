@@ -3,6 +3,7 @@ const Product = require("../models/product");
 const User = require("../models/user");
 const Category = require("../models/category");
 const bodyParser = require('body-parser');
+const Bookfree = require("../models/bookfree");
 exports.categorys_get_all = (req, res, next) => {
   Category.find().sort({ "name" : 1 })
     .select()
@@ -62,28 +63,28 @@ exports.categorys_create_category = (req, res, next) => {
     });
 };
 
-exports.categorys_get_category = (req, res, next) => {
-  const id = req.params.categoryId;
-  Category.findById(id)
-    .select()
-    .exec()
-    .then(doc => {
-      console.log("From database", doc);
-      if (doc) {
-        res.status(200).json({
-          category: doc,
-        });
-      } else {
-        res
-          .status(404)
-          .json({ message: "No valid entry found for provided ID" });
-      }
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({ error: err });
-    });
-};
+// exports.categorys_get_category = (req, res, next) => {
+//   const id = req.params.categoryId;
+//   Category.findById(id)
+//     .select()
+//     .exec()
+//     .then(doc => {
+//       console.log("From database", doc);
+//       if (doc) {
+//         res.status(200).json({
+//           category: doc,
+//         });
+//       } else {
+//         res
+//           .status(404)
+//           .json({ message: "No valid entry found for provided ID" });
+//       }
+//     })
+//     .catch(err => {
+//       console.log(err);
+//       res.status(500).json({ error: err });
+//     });
+// };
 
 exports.categorys_update_category = (req, res, next) => {
   const id = req.params.categoryId;
@@ -123,6 +124,33 @@ exports.categorys_delete = (req, res, next) => {
           body: { name: "String" }
         }
       });
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
+};
+
+exports.categorys_get_category = (req, res, next) => {
+  const id = req.params.categoryId;
+  Bookfree.find( { category: mongoose.Types.ObjectId(id) } )
+    .select()
+    .populate("bookfree")
+    .exec()
+    .then(docs => {
+      const response = {
+        count: docs.length,
+        categorys: docs
+      };
+        // if (docs.length >= 0) {
+      res.status(200).json(response);
+        // } else {
+        //     res.status(404).json({
+        //         message: 'No entries found'
+        //     });
+        // }
     })
     .catch(err => {
       console.log(err);

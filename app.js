@@ -10,6 +10,7 @@ const userRoutes = require('./api/routes/user');
 const contactRoutes = require('./api/routes/contact');
 const categoryRoutes = require('./api/routes/category');
 const faqRoutes = require('./api/routes/faq');
+const bookfreeRoutes = require('./api/routes/bookfree');
 
 mongoose.connect(
   "mongodb://node-bookshop:" +
@@ -46,6 +47,7 @@ app.use("/user", userRoutes);
 app.use("/contacts", contactRoutes);
 app.use("/categorys", categoryRoutes);
 app.use("/faqs", faqRoutes);
+app.use("/bookfrees", bookfreeRoutes);
 
 app.use((req, res, next) => {
   const error = new Error("Not found");
