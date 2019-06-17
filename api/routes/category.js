@@ -24,6 +24,8 @@ const upload = multer({ storage: storage });
 
 router.get("/", CategorysController.categorys_get_all);
 
+router.get("/number", CategorysController.Books_get_user);
+
 router.post("/", CategorysController.categorys_create_category);
 
 router.get("/:categoryId", CategorysController.categorys_get_category);

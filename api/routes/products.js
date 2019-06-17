@@ -33,7 +33,7 @@ router.get("/popular", ProductsController.products_get_popular);
 
 router.get("/best", ProductsController.products_get_best);
 
-router.get("/user_product", checkAuth ,ProductsController.products_get_user);
+router.get("/user_product" ,ProductsController.products_get_user);
 
 router.post("/", checkAuth, upload.single('productImage'), ProductsController.products_create_product);
 

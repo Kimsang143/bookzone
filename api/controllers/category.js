@@ -159,3 +159,26 @@ exports.categorys_get_category = (req, res, next) => {
       });
     });
 };
+exports.Books_get_user = (req, res, next) => {
+  Bookfree.aggregate([{$group : {_id : "$category", user_product : {$sum : 1}}}])
+    .exec()
+    .then(docs => {
+      const response = {
+        count: docs.length,
+        products: docs
+      };
+      //   if (docs.length >= 0) {
+      res.status(200).json(response);
+      //   } else {
+      //       res.status(404).json({
+      //           message: 'No entries found'
+      //       });
+      //   }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
+};
