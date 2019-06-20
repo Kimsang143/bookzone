@@ -164,12 +164,17 @@ exports.products_get_user = (req, res, next) => {
 
 exports.products_create_product = (req, res, next) => {
   const body = req.body;
-
   const product = new Product({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
+    author: req.body.author,
+    publisher: req.body.publisher,
+    publish_year: req.body.publish_year,
+    descript: req.body.descript,
+    rating: req.body.rating,
     price: req.body.price,
     productImage: req.file.url,
+    category: req.body.category,
     user: req.userData.userId
   });
   product
@@ -179,9 +184,10 @@ exports.products_create_product = (req, res, next) => {
       res.status(201).json({
         message: "Created product successfully",
         createdProduct: {
+           _id: result._id,
           name: result.name,
+          author: result.author,
           price: result.price,
-          _id: result._id,
           request: {
             type: "GET",
             url: "http://localhost:3000/products/" + result._id
@@ -224,7 +230,7 @@ exports.products_create_product = (req, res, next) => {
 exports.products_get_product = (req, res, next) => {
   const id = req.params.productId;
   Product.findById(id)
-    .select("name price productImage")
+    .select()
     .populate("user","username shop_name tel email")
     .exec()
     .then(doc => {
