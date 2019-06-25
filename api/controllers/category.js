@@ -135,9 +135,9 @@ exports.categorys_delete = (req, res, next) => {
 
 exports.categorys_get_category = (req, res, next) => {
   const id = req.params.categoryId;
-  Bookfree.find( { category: mongoose.Types.ObjectId(id) } )
+  Product.find( { category: mongoose.Types.ObjectId(id) } )
     .select()
-    .populate("bookfree")
+    .populate("Product")
     .exec()
     .then(docs => {
       const response = {
@@ -160,7 +160,7 @@ exports.categorys_get_category = (req, res, next) => {
     });
 };
 exports.Books_get_user = (req, res, next) => {
-  Bookfree.aggregate([{$group : {_id : "$category", user_product : {$sum : 1}}}])
+  Product.aggregate([{$group : {_id : "$category", user_product : {$sum : 1}}}])
     .exec()
     .then(docs => {
       const response = {
