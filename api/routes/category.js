@@ -16,7 +16,7 @@ cloudinary.config({
 
 const storage = cloudinaryStorage({
     cloudinary: cloudinary,
-    folder: "demo",
+    folder: "icon_category",
     allowedFormats: ["jpg", "png"]
 });
 
@@ -26,7 +26,7 @@ router.get("/", CategorysController.categorys_get_all);
 
 router.get("/number", CategorysController.Books_get_user);
 
-router.post("/", CategorysController.categorys_create_category);
+router.post("/", upload.single('categoryLogo') ,CategorysController.categorys_create_category);
 
 router.get("/:categoryId", CategorysController.categorys_get_category);
 

@@ -15,6 +15,7 @@ exports.categorys_get_all = (req, res, next) => {
           return {
             _id: doc._id,
             name: doc.name,
+            categoryLogo: doc.categoryLogo,
           };
         })
       };
@@ -37,7 +38,8 @@ exports.categorys_get_all = (req, res, next) => {
 exports.categorys_create_category = (req, res, next) => {
   const category = new Category({
     _id: new mongoose.Types.ObjectId(),
-    name: req.body.name
+    name: req.body.name,
+    categoryLogo: req.file.url
   });
   category
     .save()
@@ -62,29 +64,6 @@ exports.categorys_create_category = (req, res, next) => {
       });
     });
 };
-
-// exports.categorys_get_category = (req, res, next) => {
-//   const id = req.params.categoryId;
-//   Category.findById(id)
-//     .select()
-//     .exec()
-//     .then(doc => {
-//       console.log("From database", doc);
-//       if (doc) {
-//         res.status(200).json({
-//           category: doc,
-//         });
-//       } else {
-//         res
-//           .status(404)
-//           .json({ message: "No valid entry found for provided ID" });
-//       }
-//     })
-//     .catch(err => {
-//       console.log(err);
-//       res.status(500).json({ error: err });
-//     });
-// };
 
 exports.categorys_update_category = (req, res, next) => {
   const id = req.params.categoryId;
