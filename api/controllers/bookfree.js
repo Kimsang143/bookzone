@@ -3,7 +3,7 @@ const Bookfree = require("../models/bookfree");
 
 exports.Bookfrees_get_all = (req, res, next) => {
   Bookfree.find().sort({ "name" : 1 })
-    .select("name author bookImage")
+    .select("name author bookImage rating descript")
     .exec()
     .then(docs => {
       const response = {

@@ -4,7 +4,7 @@ const User = require("../models/user");
 
 exports.products_get_all = (req, res, next) => {
   Product.find()
-    .select("name price _id productImage user")
+    .select("name price _id productImage rating user author descript")
     .exec()
     .then(docs => {
       const response = {
@@ -12,9 +12,12 @@ exports.products_get_all = (req, res, next) => {
         products: docs.map(doc => {
           return {
             name: doc.name,
+            author: doc.author,
+            rating: doc.rating,
             price: doc.price,
             productImage: doc.productImage,
             _id: doc._id,
+            descript: doc.descript,
             user: doc.user,
             request: {
               type: "GET",
