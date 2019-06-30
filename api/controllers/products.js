@@ -1,28 +1,24 @@
 const mongoose = require("mongoose");
 const Product = require("../models/product");
-const User = require("../models/user");
+const ShopProfile = require("../models/shopProfile");
 
 exports.products_get_all = (req, res, next) => {
   Product.find()
-    .select("name price _id productImage rating user author descript")
+    .select("name price _id productImage rating shopProfile author descript")
     .exec()
     .then(docs => {
       const response = {
         count: docs.length,
         products: docs.map(doc => {
           return {
+            _id: doc._id,
             name: doc.name,
             author: doc.author,
             rating: doc.rating,
             price: doc.price,
             productImage: doc.productImage,
-            _id: doc._id,
             descript: doc.descript,
-            user: doc.user,
-            request: {
-              type: "GET",
-              url: "http://localhost:3000/products/" + doc._id
-            }
+            shopProfile: doc.shopProfile
           };
         })
       };
@@ -55,7 +51,7 @@ exports.products_get_search = (req, res, next) => {
         });                
       }
       return res.status(500).send({
-        message: "Error retrieving Products with given User Id " + req.params.productName
+        message: "Error retrieving Products with given shopProfile Id " + req.params.productName
       });
     }
           
@@ -141,29 +137,29 @@ exports.products_get_best = (req, res, next) => {
 };
 
 
-exports.products_get_user = (req, res, next) => {
-  Product.aggregate([{$group : {_id : "$user", user_product : {$sum : 1}}}])
-    .exec()
-    .then(docs => {
-      const response = {
-        count: docs.length,
-        products: docs
-      };
-      //   if (docs.length >= 0) {
-      res.status(200).json(response);
-      //   } else {
-      //       res.status(404).json({
-      //           message: 'No entries found'
-      //       });
-      //   }
-    })
-    .catch(err => {
-      console.log(err);
-      res.status(500).json({
-        error: err
-      });
-    });
-};
+// exports.products_get_shopProfile = (req, res, next) => {
+//   Product.aggregate([{$group : {_id : "$shopProfile", shopProfile_product : {$sum : 1}}}])
+//     .exec()
+//     .then(docs => {
+//       const response = {
+//         count: docs.length,
+//         products: docs
+//       };
+//       //   if (docs.length >= 0) {
+//       res.status(200).json(response);
+//       //   } else {
+//       //       res.status(404).json({
+//       //           message: 'No entries found'
+//       //       });
+//       //   }
+//     })
+//     .catch(err => {
+//       console.log(err);
+//       res.status(500).json({
+//         error: err
+//       });
+//     });
+// };
 
 exports.products_create_product = (req, res, next) => {
   const body = req.body;
@@ -178,7 +174,7 @@ exports.products_create_product = (req, res, next) => {
     price: req.body.price,
     productImage: req.file.url,
     category: req.body.category,
-    user: req.userData.userId
+    shopProfile: req.body.shopProfileId
   });
   product
     .save()
@@ -206,10 +202,10 @@ exports.products_create_product = (req, res, next) => {
     });
 };
 
-// important user item
-// exports.products_get_users = (req, res, next) => {
-//   const id = req.params.productUser;
-//   Product.find( { user: mongoose.Types.ObjectId(id) } )
+// important shopProfile item
+// exports.products_get_shopProfiles = (req, res, next) => {
+//   const id = req.params.productshopProfile;
+//   Product.find( { shopProfile: mongoose.Types.ObjectId(id) } )
 //     .select("name price productImage")
 //     .exec()
 //     .then(doc => {
@@ -234,7 +230,7 @@ exports.products_get_product = (req, res, next) => {
   const id = req.params.productId;
   Product.findById(id)
     .select()
-    .populate("user","username shop_name tel email")
+    .populate("shopProfile","shopName descript tel location profileLogo")
     .exec()
     .then(doc => {
       console.log("From database", doc);

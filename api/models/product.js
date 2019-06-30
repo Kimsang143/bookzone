@@ -12,7 +12,7 @@ const productSchema = mongoose.Schema({
     price: { type: Number, required: true },
     productImage: { type: String, required: true },
     category: [{ type: Schema.Types.ObjectId, ref: 'Category', required: true }],
-  	user: [{ type: Schema.Types.ObjectId, ref: 'User', required: true }]
+    shopProfile: [{ type: Schema.Types.ObjectId, ref: 'ShopProfile', required: true }]
   	},
   	{timestamps: true });
 

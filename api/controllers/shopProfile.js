@@ -119,3 +119,38 @@ exports.ShopProfiles_get_ShopProfile = (req, res, next) => {
       res.status(500).json({ error: err });
     });
 };
+
+exports.ShopProfiles_get_product = (req, res, next) => {
+  const id = req.params.ShopProfileId;
+  Product.find( { shopProfile: mongoose.Types.ObjectId(id) } )
+    .select("name price productImage")
+    //.populate("shopProfile","username shop_name tel email")
+    .exec()
+    .then(docs => {
+      const response = {
+        count: docs.length,
+        products: docs.map(doc => {
+          return {
+            name: doc.name,
+            price: doc.price,
+            productImage: doc.productImage,
+            _id: doc._id,
+            //shopProfile: doc.shopProfile,
+          };
+        })
+      };
+        // if (docs.length >= 0) {
+      res.status(200).json(response);
+        // } else {
+        //     res.status(404).json({
+        //         message: 'No entries found'
+        //     });
+        // }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
+};

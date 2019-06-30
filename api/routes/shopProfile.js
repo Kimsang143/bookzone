@@ -31,4 +31,6 @@ router.patch("/:ShopProfileId", ShopProfilesController.ShopProfiles_update_ShopP
 
 router.delete("/:ShopProfileId", ShopProfilesController.ShopProfiles_delete);
 
+router.get("/products/:ShopProfileId",ShopProfilesController.ShopProfiles_get_product);
+
 module.exports = router;
